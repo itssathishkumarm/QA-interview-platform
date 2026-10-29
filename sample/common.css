@@ -1,0 +1,27 @@
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;color:#1b2430;background:#f7f5f0}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:#fff;border-bottom:1px solid #e3ded3}
+.logo{font-weight:700;color:#0f5c52;text-decoration:none;font-size:16px}
+nav{display:flex;gap:14px}nav a{color:#4a5563;text-decoration:none}nav a:hover{color:#0f5c52}
+.pill{background:#e6f2ef;border:1px solid #b7d8d1;color:#0f5c52;padding:4px 10px;border-radius:999px;font-weight:600}
+.pill span{background:#0f5c52;color:#fff;border-radius:999px;padding:0 7px;margin-left:4px}
+main{padding:16px;max-width:980px;margin:0 auto}
+.two-col{display:grid;grid-template-columns:1fr 220px;gap:16px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.card,.panel{background:#fff;border:1px solid #e3ded3;border-radius:8px;padding:12px}
+.card .meta{display:flex;justify-content:space-between;font:11px ui-monospace,monospace;color:#7b8794}
+.card h4{margin:6px 0 2px}.price{font-weight:700;color:#0f5c52}
+button{cursor:pointer;border:0;border-radius:6px;padding:7px 12px;font-weight:600;background:#0f5c52;color:#fff}
+button:hover{background:#0b4a42}button:disabled{opacity:.55;cursor:wait}
+button.alt{background:#b45309}
+input,select{width:100%;padding:7px 9px;border:1px solid #cfc9bc;border-radius:6px;font:inherit;background:#fff}
+input[type=file]{padding:5px}
+label{display:block;font-size:12px;color:#5b6573;margin:8px 0 3px}
+.panel+.panel{margin-top:12px}.panel h3{margin:0 0 6px;font-size:14px}
+.row{display:flex;gap:8px}.row>*{flex:1}.row>button{flex:none}
+.ok{background:#e8f5ee;border:1px solid #9bd3b4;color:#14532d;padding:7px 9px;border-radius:6px;margin-top:8px;font:12px ui-monospace,monospace}
+.err{background:#fdecea;border:1px solid #f1a9a0;color:#7a1d14;padding:7px 9px;border-radius:6px;margin-top:8px;font:12px ui-monospace,monospace}
+[hidden]{display:none!important}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid #eee8dc}th{font-size:12px;color:#5b6573}
+ul{padding-left:18px;margin:6px 0}
+iframe{border:1px dashed #6aa5b5;border-radius:6px;background:#fff}

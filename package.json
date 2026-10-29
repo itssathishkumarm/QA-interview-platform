@@ -1,0 +1,18 @@
+{
+  "name": "pawmart-qa-interview",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local QA automation interview platform (Playwright + TypeScript)",
+  "scripts": {
+    "setup": "npx playwright install chromium",
+    "start": "node server.js",
+    "selftest": "node selftest.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@playwright/test": "1.56.1",
+    "express": "^4.19.2"
+  }
+}

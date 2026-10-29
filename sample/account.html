@@ -1,0 +1,9 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PawMart | Account</title><link rel="stylesheet" href="common.css"></head><body>
+<header><a class="logo" href="./">PawMart</a><nav><a href="./">Shop</a><a href="checkout">Checkout</a><a href="account">Account</a></nav>
+<div class="pill">Pet Cart <span data-testid="dotcom-cart-badge">0</span></div></header>
+<main><div class="panel"><h3>Your account</h3><p data-testid="account-welcome" id="w">Loading...</p></div></main>
+<script src="common.js"></script>
+<script>
+fetch('api/v1/me').then(async r=>{const w=document.getElementById('w');
+  if(r.ok){const j=await r.json();w.textContent='Welcome back, '+j.user+' ('+j.tier+')'}else{w.textContent='Please log in to view your account'}});
+</script></body></html>

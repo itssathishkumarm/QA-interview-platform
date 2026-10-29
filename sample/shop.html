@@ -1,0 +1,38 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PawMart | Pet Store</title><link rel="stylesheet" href="common.css"></head><body>
+<header><a class="logo" href="./">PawMart</a><nav><a href="./">Shop</a><a href="checkout">Checkout</a><a href="account">Account</a></nav>
+<div class="pill">Pet Cart <span data-testid="dotcom-cart-badge">0</span></div></header>
+<main class="two-col">
+  <section>
+    <input data-testid="dotcom-search-input" id="search" type="search" aria-label="Search pet supplies" placeholder="Search pet supplies (Kibble, Heater)">
+    <div id="grid" class="grid"></div>
+  </section>
+  <aside class="panel"><h3>In your cart</h3><ul id="cartList"></ul></aside>
+</main>
+<script src="common.js"></script>
+<script>
+const grid=document.getElementById('grid'),search=document.getElementById('search'),cartList=document.getElementById('cartList');
+function renderCart(){renderBadge();cartList.innerHTML='';getCart().forEach(n=>{const li=document.createElement('li');li.setAttribute('data-testid','cart-item');li.textContent=n;cartList.appendChild(li)})}
+function render(items){
+  grid.innerHTML='';
+  items.forEach(p=>{
+    const card=document.createElement('div');card.className='card';card.setAttribute('data-testid','product-card');
+    const meta=document.createElement('div');meta.className='meta';
+    const dyn='btn-paw-'+Math.floor(10000+Math.random()*90000); // changes on every render
+    meta.innerHTML='<span></span><span></span>';meta.children[0].textContent=p.category;meta.children[1].textContent='#'+dyn;
+    const h=document.createElement('h4');h.textContent=p.name;
+    const pr=document.createElement('div');pr.className='price';pr.textContent='$'+p.price+'.00';
+    const b=document.createElement('button');b.id=dyn;b.textContent='Add to Cart';
+    b.onclick=()=>{addToCart(p.name);renderCart()};
+    card.append(meta,h,pr,b);grid.appendChild(card);
+  });
+}
+let t;
+search.addEventListener('input',()=>{
+  clearTimeout(t);
+  t=setTimeout(async()=>{ // 300ms debounce + ~500ms server delay; old grid stays visible until response lands
+    const r=await fetch('api/v1/pets/search?q='+encodeURIComponent(search.value.trim()));
+    render(await r.json());
+  },300);
+});
+(async()=>{const r=await fetch('api/v1/pets/catalog');render(await r.json());renderCart()})();
+</script></body></html>

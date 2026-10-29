@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PawMart Vet POS</title><link rel="stylesheet" href="common.css"></head><body>
+<header><a class="logo" href="pos">PawMart Vet Clinic POS</a>
+<div class="pill">Shift: <b data-testid="pos-shift-label" id="shiftLabel">cashier-standard</b> &nbsp; Cart <span data-testid="pos-cart-count" id="cartCount">0</span></div></header>
+<main>
+  <div class="panel"><h3>Pet supply inventory</h3>
+    <table><thead><tr><th>Product</th><th>On hand</th><th>Price</th><th></th></tr></thead><tbody id="inv"></tbody></table>
+    <ul data-testid="pos-cart-lines" id="lines"></ul>
+  </div>
+  <div class="panel"><h3>Clinic shift and microchip import</h3>
+    <div class="row"><div><label for="shift">Clinic shift</label>
+      <select id="shift" data-testid="pos-shift-select"><option value="cashier-standard">Front Desk Standard Shift</option>
+        <option value="vet-supervisor">Vet Supervisor Override</option><option value="grooming-desk">Grooming Check-In Mode</option></select></div>
+      <div><label for="csv">Microchip scans (CSV)</label><input id="csv" type="file" data-testid="pos-csv-upload" accept=".csv,.txt"></div></div>
+    <div class="ok" data-testid="pos-csv-status" id="csvStatus" hidden></div>
+  </div>
+  <div class="panel"><h3>Clinic promo code</h3>
+    <div class="row"><input data-testid="pos-promo-input" id="promo" aria-label="Promo code" placeholder="Enter PAW10">
+    <button data-testid="pos-apply-promo-btn" id="apply">Apply Promo</button></div>
+    <div class="ok" data-testid="pos-promo-status" id="promoStatus" style="min-height:30px"></div>
+  </div>
+  <div class="panel"><h3>Vet cloud receipt</h3>
+    <button class="alt" data-testid="pos-cloud-receipt-btn" id="receipt">Sync Vet Cloud Receipt</button>
+    <div data-testid="pos-receipt-toast" id="toast" style="margin-top:8px"></div>
+  </div>
+</main>
+<script>
+const H={'Content-Type':'application/json'};let cart=0;
+const inv=document.getElementById('inv'),lines=document.getElementById('lines');
+(async()=>{
+  const items=await (await fetch('api/v1/pets/catalog')).json();
+  for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]]}
+  items.forEach(p=>{
+    const tr=document.createElement('tr');tr.setAttribute('data-testid','pos-inventory-row');
+    ['name','stock','price'].forEach(k=>{const td=document.createElement('td');td.textContent=k==='stock'?p.stock+' '+p.unit:k==='price'?'$'+p.price:p.name;tr.appendChild(td)});
+    const td=document.createElement('td');const b=document.createElement('button');b.textContent='+ POS Cart';
+    b.onclick=()=>{cart++;document.getElementById('cartCount').textContent=cart;const li=document.createElement('li');li.textContent=p.name;lines.appendChild(li)};
+    td.appendChild(b);tr.appendChild(td);inv.appendChild(tr);
+  });
+  setInterval(()=>{const first=inv.firstElementChild;if(first)inv.appendChild(first)},4000); // live re-sort: row positions are not stable
+})();
+document.getElementById('shift').addEventListener('change',e=>{document.getElementById('shiftLabel').textContent=e.target.value});
+document.getElementById('csv').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  await fetch('api/v2/pos/microchip-batch',{method:'POST',headers:H,body:JSON.stringify({name:f.name})});
+  const s=document.getElementById('csvStatus');s.textContent='Microchip batch imported: '+f.name+' (shift: '+document.getElementById('shift').value+')';s.hidden=false;
+});
+document.getElementById('apply').addEventListener('click',async()=>{
+  const code=document.getElementById('promo').value.trim();if(!code)return;
+  const st=document.getElementById('promoStatus'),btn=document.getElementById('apply');
+  st.textContent='Validating...';btn.disabled=true;
+  const r=await fetch('api/v2/pos/promo-validate',{method:'POST',headers:H,body:JSON.stringify({code})});
+  st.textContent=(await r.json()).message;btn.disabled=false;
+});
+document.getElementById('receipt').addEventListener('click',async()=>{
+  const t=document.getElementById('toast');
+  const r=await fetch('api/v2/pos/cloud-receipt',{method:'POST',headers:H,body:'{}'});
+  if(!r.ok){t.className='err';t.textContent='ERROR '+r.status+': Vet Cloud Print Service Unavailable';return}
+  const j=await r.json();t.className='ok';t.textContent='Receipt '+j.status+': '+j.receiptId;
+});
+</script></body></html>

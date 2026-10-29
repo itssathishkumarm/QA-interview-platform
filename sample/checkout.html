@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PawMart | Checkout</title><link rel="stylesheet" href="common.css"></head><body>
+<header><a class="logo" href="./">PawMart</a><nav><a href="./">Shop</a><a href="checkout">Checkout</a><a href="account">Account</a></nav>
+<div class="pill">Pet Cart <span data-testid="dotcom-cart-badge">0</span></div></header>
+<main>
+  <div class="panel"><h3>Pet profile</h3><div class="pill" style="display:inline-block"><span data-testid="pet-profile-badge" id="profile" style="background:none;color:inherit;margin:0;padding:0">NO PET PROFILE</span></div></div>
+  <div class="panel"><h3>Vet prescription approval</h3>
+    <div class="row"><div><label for="species">Pet species</label>
+      <select id="species" data-testid="dotcom-pet-select">
+        <option value="standard-pet">Standard OTC Pet Supply</option><option value="canine-rx">Dog - Rx Vet Approved</option>
+        <option value="feline-rx">Cat - Rx Vet Approved</option><option value="aquatic-care">Freshwater / Betta Aquatic</option></select></div>
+      <div><label for="rx">Vet prescription (PDF)</label><input id="rx" type="file" data-testid="dotcom-rx-upload" accept=".pdf,.png,.jpg"></div></div>
+    <div class="ok" data-testid="dotcom-upload-status" id="rxStatus" hidden></div>
+  </div>
+  <div class="panel"><h3>Payment</h3><iframe id="pci-card-iframe" title="PetCare secure card form" width="100%" height="190"></iframe></div>
+  <div class="panel"><h3>Delivery</h3>
+    <div class="row"><input data-testid="dotcom-address-input" id="addr" aria-label="Delivery address" placeholder="Delivery address, e.g. 742 Bark Ave Gate #4B">
+    <button data-testid="dotcom-place-order-btn" id="place">Place Pet Order</button></div>
+    <div class="ok" data-testid="dotcom-order-confirmed" id="confirmed" hidden></div>
+  </div>
+</main>
+<script src="config.js"></script><script src="common.js"></script>
+<script>
+document.getElementById('profile').textContent=localStorage.getItem('pet_profile')||'NO PET PROFILE';
+document.getElementById('pci-card-iframe').src=window.PAWMART.pciUrl;
+const sel=document.getElementById('species'),rx=document.getElementById('rx'),st=document.getElementById('rxStatus');
+rx.addEventListener('change',async()=>{
+  const f=rx.files[0];if(!f)return;
+  await fetch('api/v1/checkout/vet-rx-upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:f.name,species:sel.value})});
+  st.textContent='Uploaded Vet Rx: '+f.name+' ('+sel.value+')';st.hidden=false;
+});
+document.getElementById('place').addEventListener('click',async()=>{
+  const c=document.getElementById('confirmed');c.hidden=true;
+  const r=await fetch('api/v1/checkout/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({address:document.getElementById('addr').value})});
+  if(!r.ok){ // silent failure: nothing on screen, only an uncaught error
+    setTimeout(()=>{throw new Error('Cannot parse unescaped gate character in delivery address payload')},0);return;
+  }
+  const j=await r.json();c.textContent='PawMart Order Confirmed: '+j.orderId;c.hidden=false;
+});
+</script></body></html>

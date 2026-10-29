@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PetCare Pay</title>
+<style>body{margin:0;padding:10px;font:13px system-ui,sans-serif;background:#eef6fa;color:#12303d}input{width:100%;padding:7px;margin:4px 0 8px;border:1px solid #9bbccb;border-radius:6px;font:inherit}
+.r{display:flex;gap:8px}button{background:#17607a;color:#fff;border:0;border-radius:6px;padding:7px 12px;font-weight:600;cursor:pointer}
+.t{display:inline-block;margin-left:8px;background:#e8f5ee;border:1px solid #9bd3b4;color:#14532d;padding:4px 8px;border-radius:6px;font:12px ui-monospace,monospace}[hidden]{display:none}</style></head><body>
+<label>Card number<input data-testid="pci-card-input" id="c" placeholder="4111222233334444" autocomplete="off"></label>
+<div class="r"><label style="flex:1">Expiry<input data-testid="pci-expiry-input" id="e" placeholder="MM/YY" autocomplete="off"></label></div>
+<button data-testid="pci-verify-btn" id="v">Verify PetCare 3DS</button><span class="t" data-testid="pci-token-badge" id="t" hidden></span>
+<script>
+document.getElementById('v').onclick=()=>{const t=document.getElementById('t');
+  if(!/^\d{16}$/.test(document.getElementById('c').value.replace(/\s/g,''))||!/^\d{2}\/\d{2}$/.test(document.getElementById('e').value)){t.textContent='Invalid card details';t.hidden=false;return}
+  t.textContent='TOK_PETCARE_'+Math.floor(1000+Math.random()*9000);t.hidden=false};
+</script></body></html>
